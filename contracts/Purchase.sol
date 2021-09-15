@@ -15,15 +15,19 @@ contract Purchase is Ownable {
 
     address treasury;
     uint256 coinCount;
+    // we want to also keep track of tonnes offset per level, where totalOffset is the accumulation of offsets from every level
     uint256 totalOffset;
     uint256 costPerTonne;
     
+    // is there a better way to store these mappings -> values?
+    // perhaps creating a 'levels' struct that contains the necessary information
     mapping(uint256 => bool) levels;
     mapping(string => IERC20) coins;
     mapping(uint256 => string) coinNames;
     mapping(uint256 => string) tokenHash;
 
-
+    // should we initialize levels or coins in the constructor ?
+    // or just call the setLevel() and addToken() functions after deployment
     constructor()
     {
         coinCount = 0;
@@ -47,7 +51,7 @@ contract Purchase is Ownable {
         coinCount = coinCount + 1;
     }
 
-    
+    // necessary (good practice) to have setters and getters for all the data we are keeping track of
     function setTreasury(address _address) external onlyOwner{
         treasury = _address;
     }
@@ -86,7 +90,8 @@ contract Purchase is Ownable {
         return costPerTonne;
     }
 
-
+    // because we cannot iterate through a mapping we need to have an additional mapping that stores the keys
+    // is there a better / more effecient way to do this?
     function getCoins() external view returns(string[] memory){
         string[] memory coinList = new string[](coinCount);
         for(uint256 i = 0; i < coinCount; i++){
@@ -98,6 +103,7 @@ contract Purchase is Ownable {
 
     function buyNFTree(uint256 _tonnes, uint256 _amount, string memory _coin) external {
 
+        // are we missing any requires or logic to prevent faulty purchases / mints
         require(msg.sender != address(0) && msg.sender != address(this), 'Sending from zero address'); 
         require(levels[_tonnes] == true, 'Not a valid level');
         require(_amount >= _tonnes * costPerTonne * (10 ** 18), 'Not enough value');

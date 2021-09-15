@@ -12,6 +12,8 @@ contract NFTree is Ownable, ERC721URIStorage {
     uint256 tokenId;
     address purchaseContract;
 
+    // should we use @openzeppelin/contracts/utils/Counters.sol ?
+    // instead of manual tokenId
     constructor() ERC721('NFTree', 'TREE')
     {
         tokenId = 1;
@@ -33,6 +35,8 @@ contract NFTree is Ownable, ERC721URIStorage {
         tokenId = tokenId + 1;
     }
 
+    // should we use ERC721Enumerable.sol?
+    // instead of creating our own function
     function tokensOfOwner(address _owner) external view returns(uint256[] memory) {
         uint256 tokenCount = balanceOf(_owner);
 
