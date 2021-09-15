@@ -6,10 +6,9 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 //import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-
 /* Contract for NFtrees */
 
-contract NFTree is Ownable, ERC721URIStorage{
+contract NFTree is Ownable, ERC721URIStorage {
     uint256 tokenId;
     address purchaseContract;
 
@@ -41,15 +40,11 @@ contract NFTree is Ownable, ERC721URIStorage{
             // Return an empty array
             return new uint256[](0);
         } else {
-            uint256[] memory result = new uint256[](tokenCount);
-            uint256 totalNFTrees = tokenId - 1;
+
             uint256 resultIndex = 0;
+            uint256[] memory result = new uint256[](tokenCount);
 
-            // We count on the fact that all cats have IDs starting at 1 and increasing
-            // sequentially up to the totalCat count.
-            uint256 NFTreeId;
-
-            for (NFTreeId = 1; NFTreeId <= totalNFTrees; NFTreeId++) {
+            for (uint256 NFTreeId = 1; NFTreeId <= tokenId - 1; NFTreeId++) {
                 if (ownerOf(NFTreeId) == _owner) {
                     result[resultIndex] = NFTreeId;
                     resultIndex++;
@@ -61,25 +56,6 @@ contract NFTree is Ownable, ERC721URIStorage{
 
     }
 
-    /*function tokensOfOwner(address _owner) external view returns(uint256[] memory) {
-        uint256 tokenCount = balanceOf(_owner);
-
-        if (tokenCount == 0) {
-            // Return an empty array
-            return new uint256[](0);
-        } else {
-            uint256[] memory result = new uint256[](tokenCount);
-            uint256 resultIndex = 0;
-
-            for (uint256 id = 1; idd <= tokenCount; id++) {
-                
-            }
-
-            return result;
-        }
-
-    }
-*/
     function getNextTokenId() external view returns(uint256){
         return(tokenId);
     }

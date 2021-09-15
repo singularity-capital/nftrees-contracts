@@ -47,8 +47,8 @@ describe("Token contract", function () {
       // This test expects the owner variable stored in the contract to be equal
       // to our Signer's owner.
       expect(await purchase.owner()).to.equal(owner.address);
-
       expect(await nftree.owner()).to.equal(owner.address);
+
     });
   });
 
@@ -66,8 +66,8 @@ describe("Token contract", function () {
         expect(await purchase.getNFTreeContract()).to.equal(nftree.address);
 
         // set the offramp wallet in the Purchase contract
-        await purchase.setOfframpWallet(wallet.address);
-        expect(await purchase.getOfframpWallet()).to.equal(wallet.address);
+        await purchase.setTreasury(wallet.address);
+        expect(await purchase.getTreasury()).to.equal(wallet.address);
 
         // mint customer mycoin
         await mycoin.mint(customer.address);
@@ -79,19 +79,26 @@ describe("Token contract", function () {
         await purchase.addToken(mycoin.address, 'USDT');
         console.log(await purchase.getCoins());
 
+        // set costPerTonne
+        await purchase.setCostPerTonne(10);
+
+        // set NFTree levels
+        await purchase.setLevel(1, true);
+        await purchase.setLevel(10, true);
+        await purchase.setLevel(100, true);
+        await purchase.setLevel(1000, true);
+
         // set token hashes 
         await purchase.setTokenHash(1, 'Level 1 Hash');
         await purchase.setTokenHash(10, 'Level 10 Hash');
         await purchase.setTokenHash(100, 'Level 100 Hash');
         await purchase.setTokenHash(1000, 'Level 1000 Hash');
-        await purchase.setTokenHash(10000, 'Level 10000 Hash');
 
         // get token hashes
         expect(await purchase.getTokenHash(1)).to.equal('Level 1 Hash');
         expect(await purchase.getTokenHash(10)).to.equal('Level 10 Hash');
         expect(await purchase.getTokenHash(100)).to.equal('Level 100 Hash');
         expect(await purchase.getTokenHash(1000)).to.equal('Level 1000 Hash');
-        expect(await purchase.getTokenHash(10000)).to.equal('Level 10000 Hash');
         
     });
 
