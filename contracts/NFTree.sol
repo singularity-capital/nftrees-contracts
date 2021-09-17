@@ -19,6 +19,8 @@ contract NFTree is Ownable, ERC721URIStorage {
         tokenId = 1;
     }
     
+    // we need a data structure to keep track of multiple purchase/factory/minting contracts
+    // add() and remove() token contracts from this data strucute whitelist
     function setPurchaseContract(address _purchaseContract) external onlyOwner{
         purchaseContract = _purchaseContract;
     }

@@ -26,6 +26,13 @@ contract Purchase is Ownable {
     mapping(uint256 => string) coinNames;
     mapping(uint256 => string) tokenHash;
 
+    // as an example
+    struct level {
+        uint256 tonnesOffset; // 1, 10, 100, 1000. etc.
+        uint256 totalOffset; // counter for tonnes offset per level (tokens minted)
+        string tokenHash; // metadata for the NFTree
+    }
+
     // should we initialize levels or coins in the constructor ?
     // or just call the setLevel() and addToken() functions after deployment
     constructor()
