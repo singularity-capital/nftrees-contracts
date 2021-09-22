@@ -39,7 +39,7 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY
   },
-  paths: {
+  /*paths: {
     artifacts: './nftrees-app/src/artifacts',
-  }
+  }*/
 };

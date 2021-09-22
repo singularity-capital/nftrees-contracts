@@ -6,122 +6,224 @@ import "./INFTree.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+//               ,@@@@@@@,
+//       ,,,.   ,@@@@@@/@@,  .oo8888o.
+//    ,&%%&%&&%,@@@@@/@@@@@@,8888\88/8o
+//   ,%&\%&&%&&%,@@@\@@@/@@@88\88888/88'
+//   %&&%&%&/%&&%@@\@@/ /@@@88888\88888'
+//   %&&%/ %&%%&&@@\ V /@@' `88\8 `/88'
+//   `&%\ ` /%&'    |.|        \ '|8'
+//       |o|        | |         | |
+//       |.|        | |         | |
+//    \\/ ._\//_/__/  ,\_//__\\/.  \_//__/_
+
 
 /* Contract for NFtrees */
+
+/**  
+    @title Purchase contract assists in the purchase/minting of NFTree ERC-721 tokens.
+ */
 
 contract Purchase is Ownable {
 
     INFTree nftree;
-
     address treasury;
-    uint256 coinCount;
-    // we want to also keep track of tonnes offset per level, where totalOffset is the accumulation of offsets from every level
     uint256 totalOffset;
-    uint256 costPerTonne;
-    
-    // is there a better way to store these mappings -> values?
-    // perhaps creating a 'levels' struct that contains the necessary information
-    mapping(uint256 => bool) levels;
-    mapping(string => IERC20) coins;
-    mapping(uint256 => string) coinNames;
-    mapping(uint256 => string) tokenHash;
 
-    // as an example
-    struct level {
-        uint256 tonnesOffset; // 1, 10, 100, 1000. etc.
-        uint256 totalOffset; // counter for tonnes offset per level (tokens minted)
-        string tokenHash; // metadata for the NFTree
+    mapping(uint256 => Level) levelMap;
+    mapping(string => Coin) coinMap;
+
+    uint256[] levels;
+    string[] coins;
+
+    struct Level {
+        bool isValid;
+        uint256 cost;
+        uint256 carbonValue;
+        uint256 numMinted;
+        string tokenURI;
     }
 
-    // should we initialize levels or coins in the constructor ?
-    // or just call the setLevel() and addToken() functions after deployment
-    constructor()
-    {
-        coinCount = 0;
+    struct Coin {
+        bool isValid;
+        IERC20 coinContract;
+    }
+
+    /**
+        @dev Sets values for {nftree} and {treasury}. Initializes {totalOffset} to 0 tonnes.
+        @param _nftreeAddress NFTree contract address.
+        @param _treasuryAddress NFTrees vault wallet address.
+     */
+    constructor(address _nftreeAddress, address _treasuryAddress)
+    {   
+        nftree = INFTree(_nftreeAddress);
+        treasury = _treasuryAddress;
         totalOffset = 0;
     }
-    
 
-    function setNFTreeContract(address _nftreeContract) external{
-        nftree = INFTree(_nftreeContract);
+    /**
+        @dev Updates {nftree} contract address.
+        @param _nftreeAddress New NFTree contract address.
+     */
+    function setNFTreeContract(address _nftreeAddress) external{
+        nftree = INFTree(_nftreeAddress);
     }
 
-
+    /**
+        @dev Retrieves current NFTree contract instance.
+        @return INFTree {nftree}.
+     */
     function getNFTreeContract() external view returns(INFTree){
-        return(nftree);
+        return nftree;
     }
 
-
-    function addToken(address _address, string memory _coin) external onlyOwner{
-        coins[_coin] = IERC20(_address);
-        coinNames[coinCount] = _coin;
-        coinCount = coinCount + 1;
-    }
-
-    // necessary (good practice) to have setters and getters for all the data we are keeping track of
+    /**
+        @dev Updates {treasury} wallet address.
+        @param _address New NFTrees vault wallet address.
+     */
     function setTreasury(address _address) external onlyOwner{
         treasury = _address;
     }
     
-
+    /**
+        @dev Retrieves current NFtree vault wallet address.
+        @return address {treasury}.
+     */
     function getTreasury() external view onlyOwner returns(address){
-        return(treasury);
+        return treasury;
+    }
+
+
+    /**
+        @dev Creates new Level instance and maps to the {levels} array.
+        @param _level Carbon value.
+        @param _cost Cost of level.
+        @param _tokenURI IPFS hash of token metadata.
+
+        requirements:
+            - levelMap[_level].isValid must be false.
+     */
+    function addLevel(uint256 _level, uint256 _cost, string memory _tokenURI) external onlyOwner {
+        require(!levelMap[_level].isValid, 'Level already exists.');
+
+        levelMap[_level] = Level(true, _cost, _level, 0, _tokenURI);
+        levels.push(_level);
+    }
+
+    /**
+        @dev Deletes Level instance and removes from {levels} array.
+        @param _level Carbon value of level to be removed.
+
+        requirements: 
+            - levelMap[_level].isValid must be true.
+
+     */
+    function removeLevel(uint256 _level) external onlyOwner {
+        require(levelMap[_level].isValid, 'Not a valid level.');
+        // delete Level
+        // delete mapping
+        // remove from array
+        
+    }
+
+    /**
+        @dev Retrieves variables in that carbon value's Level struct.
+        @param _level Carbon value of level to be returned.
+        @return uint256 {levelMap[_level].cost}.
+        @return uint256 {levelMap[_level].carbonValue}.
+        @return uint256 {levelMap[_level].numMinted}.
+
+        requirements:
+            - levelMap[_level].isValid must be true.
+     */
+    function getLevel(uint256 _level) external view returns(uint256, uint256, uint256, string memory) {
+        require(levelMap[_level].isValid, 'Not a valid level');
+        return (levelMap[_level].cost, levelMap[_level].carbonValue, levelMap[_level].numMinted, levelMap[_level].tokenURI);
+    }
+
+    /**
+        @dev Retrieves array of valid levels.
+        @return uint256[] {levels}.
+     */
+    function getValidLevels() external view returns(uint256[] memory) {
+        // uint256 sortedLevels = sort(levels);
+        return levels;
+    }
+
+    /**
+        @dev Creates new Coin instance and maps to the {coins} array. 
+        @param _address Contract address for the coin.
+        @param _coin Coin name.
+     */
+    function addCoin(address _address, string memory _coin) external onlyOwner {
+        require(!coinMap[_coin].isValid, 'Coin already exists.');
+
+        coinMap[_coin] = Coin(true, IERC20(_address));
+        coins.push(_coin);
+    }
+
+    /**
+        @dev Deletes Coin instance and removes from {coins} array.
+        @param _coin Name of coin.
+
+        requirements: 
+            - cionMap[_coin].isValid must be true.
+     */
+    function removeCoin(string memory _coin) external onlyOwner {
+        require(coinMap[_coin].isValid, 'Not a valid coin.');
+        // delete Coin
+        // delete mapping
+        // remove from array
+    }
+
+    /**
+        @dev Retrieves array of valid coins.
+        @return uint256[] {coins}.
+     */
+    function getValidCoins() external view returns(string[] memory) {
+        return coins;
     }
     
-
-    function setTokenHash(uint256 _level, string memory _hash) public onlyOwner{
-        tokenHash[_level] = _hash;
-    }
-    
-
-    function getTokenHash(uint256 _level) external view onlyOwner returns(string memory){
-        return(tokenHash[_level]);
-    }
-    
-
+    /**
+        @dev Retrieves total offset.
+        @return uint256 {totalOffset}.
+     */
     function getTotalOffset() external view returns(uint256){
         return(totalOffset);
     }
-    
 
-    function setLevel(uint256 _level, bool value) public onlyOwner {
-        levels[_level] = value;
-    }
+    /**
+        @dev Mints NFTree to {msg.sender} and transfers payment to {treasury}. 
+        @param _tonnes Carbon value of NFTree to purchase.
+        @param _amount Dollar value to be transferred to {treasury} from {msg.sender}.
+        @param _coin Coin to be used to purchase.
 
+        Requirements:
+            - {msg.sender} can not be the zero address.
+            - {_level} must be a valid level.
+            - {_coin} must be a valid coin.
+            - {_amount} must be creater than the cost to mint that level.
+            - {msg.sender} must have a balance of {_coin} that is greater than or equal to {_amount}.
+            - Allowance of {address(this)} to spend {msg.sender}'s {_coin} must be greater than or equal to {_amount}.
 
-    function setCostPerTonne(uint256 _costPerTonne) public onlyOwner {
-        costPerTonne = _costPerTonne;
-    }
-
-    function getCostPerTonne() external view returns(uint256) {
-        return costPerTonne;
-    }
-
-    // because we cannot iterate through a mapping we need to have an additional mapping that stores the keys
-    // is there a better / more effecient way to do this?
-    function getCoins() external view returns(string[] memory){
-        string[] memory coinList = new string[](coinCount);
-        for(uint256 i = 0; i < coinCount; i++){
-            coinList[i] = coinNames[i];
-        }
-        return(coinList);
-    }
-
-
+     */
     function buyNFTree(uint256 _tonnes, uint256 _amount, string memory _coin) external {
-
-        // are we missing any requires or logic to prevent faulty purchases / mints
-        require(msg.sender != address(0) && msg.sender != address(this), 'Sending from zero address'); 
-        require(levels[_tonnes] == true, 'Not a valid level');
-        require(_amount >= _tonnes * costPerTonne * (10 ** 18), 'Not enough value');
-        require(coins[_coin].balanceOf(msg.sender) >= _amount, 'Not enough balance');
-        require(coins[_coin].allowance(msg.sender, address(this)) >= _amount, 'Not enough allowance');
+        // check requirements
+        require(msg.sender != address(0) && msg.sender != address(this), 'Sending from zero address.'); 
+        require(levelMap[_tonnes].isValid, 'Not a valid level.');
+        require(coinMap[_coin].isValid, 'Not a valid coin.');
+        require(_amount >= levelMap[_tonnes].cost, 'Not enough value.');
+        require(coinMap[_coin].coinContract.balanceOf(msg.sender) >= _amount, 'Not enough balance.');
+        require(coinMap[_coin].coinContract.allowance(msg.sender, address(this)) >= _amount, 'Not enough allowance.');
         
         // transfer tokens
-        coins[_coin].transferFrom(msg.sender, treasury, _amount);
-        nftree.buyNFTree(msg.sender, tokenHash[_tonnes]);
+        coinMap[_coin].coinContract.transferFrom(msg.sender, treasury, _amount);
+        nftree.buyNFTree(msg.sender, levelMap[_tonnes].tokenURI);
         
-        // add to total carbon offset log
-        totalOffset = totalOffset + _tonnes;
+        // log purchase
+        levelMap[_tonnes].numMinted += 1;
+        totalOffset += _tonnes;
+
+        // emit event
     }
 }
