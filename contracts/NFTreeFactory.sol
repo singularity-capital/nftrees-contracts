@@ -91,19 +91,18 @@ contract NFTreeFactory is Ownable {
 
 
     /**
-        @dev Creates new Level instance and maps to the {levels} array.
+        @dev Creates new Level instance and maps to the {levels} array. If the level already exists,
+        the function updates the struct but does not push to the levels array.
         @param _level Carbon value.
         @param _cost Cost of level.
         @param _tokenURI IPFS hash of token metadata.
-
-        requirements:
-            - levelMap[_level].isValid must be false.
      */
     function addLevel(uint256 _level, uint256 _cost, string memory _tokenURI) external onlyOwner {
-        require(!levelMap[_level].isValid, 'Level already exists.');
-
+        if (!levelMap[_level].isValid) {
+            levels.push(_level);
+        }
+            
         levelMap[_level] = Level(true, _cost, _level, 0, _tokenURI);
-        levels.push(_level);
     }
 
     /**
@@ -111,7 +110,7 @@ contract NFTreeFactory is Ownable {
         @param _level Carbon value of level to be removed.
 
         requirements: 
-            - levelMap[_level].isValid must be true.
+            - {_level} must be a valid level.
 
      */
     function removeLevel(uint256 _level) external onlyOwner {
@@ -139,7 +138,7 @@ contract NFTreeFactory is Ownable {
         @return uint256 {levelMap[_level].numMinted}.
 
         requirements:
-            - levelMap[_level].isValid must be true.
+            - {_level} must be a valid level.
      */
     function getLevel(uint256 _level) external view returns(uint256, uint256, uint256, string memory) {
         require(levelMap[_level].isValid, 'Not a valid level');
@@ -156,15 +155,19 @@ contract NFTreeFactory is Ownable {
     }
 
     /**
-        @dev Creates new Coin instance and maps to the {coins} array. 
+        @dev Creates new Coin instance and maps to the {coins} array.
         @param _address Contract address for the coin.
         @param _coin Coin name.
+
+        Requirements:
+            - {_coin} must not already be a valid coin.
      */
     function addCoin(address _address, string memory _coin) external onlyOwner {
-        require(!coinMap[_coin].isValid, 'Coin already exists.');
+        require(!coinMap[_coin].isValid, 'Already a valid coin.');
 
-        coinMap[_coin] = Coin(true, IERC20(_address));
         coins.push(_coin);
+        coinMap[_coin] = Coin(true, IERC20(_address));
+
     }
 
     /**
@@ -172,7 +175,7 @@ contract NFTreeFactory is Ownable {
         @param _coin Name of coin.
 
         requirements: 
-            - cionMap[_coin].isValid must be true.
+            - {_coin} must be a valid coin.
      */
     function removeCoin(string memory _coin) external onlyOwner {
         require(coinMap[_coin].isValid, 'Not a valid coin.');

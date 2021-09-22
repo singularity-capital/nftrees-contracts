@@ -6,6 +6,9 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 //import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+/**  
+    @title NFTree contract following the ERC-721 NFT token standard.
+ */
 
 contract NFTree is Ownable, ERC721URIStorage {
     uint256 tokenId;
@@ -18,18 +21,36 @@ contract NFTree is Ownable, ERC721URIStorage {
         address contractAddress;
     }
 
+    /**
+        @dev Sets values for {_name} and {_symbol}.
+     */
     constructor() ERC721('NFTree', 'TREE')
     {
         tokenId = 1;
     }
 
+    /**
+        @dev Creates new Whitelist instance and maps to the {whitelists} array.
+        @param _contractAddress the address of the contract to be whitelisted.
+
+        requirements:
+            - {_contractAddress} must not already be the address of a contract on the whitelist.
+     */
     function addWhitelist(address _contractAddress) external onlyOwner{
-        require(whitelistMap[_contractAddress].isValid, 'Contrat already whitelisted.');
+        require(whitelistMap[_contractAddress].isValid, 'Contract already whitelisted.');
 
         whitelistMap[_contractAddress] = Whitelist(true, _contractAddress);
         whitelists.push(_contractAddress);
     }
 
+    /**
+        @dev Deletes Whitelist instance and removes from {whitelists} array.
+        @param _contractAddress Address of the contract to be removed from the whitelist.
+
+        requirements: 
+            - {_contractAddress} must be the address of a whitelisted contract.
+
+     */
     function removeWhitelist(address _contractAddress) external onlyOwner {
         require(whitelistMap[_contractAddress].isValid, 'Not a valid whitelisted contract.');
 
@@ -47,14 +68,26 @@ contract NFTree is Ownable, ERC721URIStorage {
         delete whitelistMap[_contractAddress];
     }
     
-    function getWhitelists() external view returns(address[] memory){
+    /**
+        @dev Retrieves array of valid whitelisted contracts.
+        @return address[] {whitelists}.
+     */
+    function getValidWhitelists() external view returns(address[] memory){
         return whitelists;
     }
 
+    /**
+        @dev Retrieves next token id.
+        @return uint256 {tokenId}.
+     */
     function getNextTokenId() external view returns(uint256){
         return tokenId;
     }
 
+    /**
+        @dev Retrieves list of tokens owned by {_owner}
+        @return uint256[] {tokenIds}.
+     */
     function tokensOfOwner(address _owner) external view returns(uint256[] memory) {
         uint256 tokenCount = balanceOf(_owner);
 
@@ -64,20 +97,28 @@ contract NFTree is Ownable, ERC721URIStorage {
         } else {
 
             uint256 resultIndex = 0;
-            uint256[] memory result = new uint256[](tokenCount);
+            uint256[] memory tokenIds = new uint256[](tokenCount);
 
-            for (uint256 NFTreeId = 1; NFTreeId <= tokenId - 1; NFTreeId++) {
-                if (ownerOf(NFTreeId) == _owner) {
-                    result[resultIndex] = NFTreeId;
+            for (uint256 i = 1; i <= tokenId - 1; i++) {
+                if (ownerOf(i) == _owner) {
+                    tokenIds[resultIndex] = i;
                     resultIndex++;
                 }
             }
 
-            return result;
+            return tokenIds;
         }
 
     }
 
+    /**
+        @dev Mints NFTree to {_recipient}. 
+        @param _recipient Address to mint the NFTree to.
+        @param _tokenURI IPFS hash of token metadata.
+
+        Requirements:
+            - {msg.sender} must be a whitelisted contract.
+     */
     function buyNFTree(address _recipient, string memory _tokenURI) external {
         require(whitelistMap[msg.sender].isValid, 'Only whitelisted addresses can mint NFTrees.');
         
