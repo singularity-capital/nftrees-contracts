@@ -7,99 +7,54 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 
-//                                                         ░░░░░░    ░░░░░░░░░░                                                          
-//                                                       ░░▒▒▒▒░░░░░░▒▒▒▒░░░░░░░░░░                                                      
-//                                                     ░░░░░░░░░░░░░░▓▓▓▓▓▓▒▒▒▒░░░░░░░░                                                  
-//                                             ░░░░    ▒▒▒▒░░░░░░░░░░▒▒▒▒▒▒▓▓▓▓▒▒░░░░░░░░                                                
-//                                           ░░░░▒▒▒▒░░▒▒▒▒▒▒░░▒▒▒▒░░▓▓▒▒▓▓▓▓▓▓▓▓▓▓▒▒░░░░                                                
-//                                         ▒▒▒▒▒▒░░░░▒▒░░▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒░░                                              
-//                                   ░░░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓▓▓████▓▓▓▓██▓▓▓▓▓▓▓▓▓▓▓▓▒▒░░▒▒▒▒                                          
-//                                 ▒▒░░▒▒░░▓▓▓▓▓▓▓▓▒▒▓▓▒▒▒▒▓▓▓▓▓▓▓▓██▓▓▓▓▒▒▓▓▓▓▓▓▓▓▒▒▒▒▒▒░░░░░░▒▒                                        
-//                               ░░░░▒▒▒▒░░▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▓▓▒▒▒▒▒▒▓▓▒▒▒▒▒▒▒▒▒▒▓▓▓▓▓▓▒▒▒▒▒▒░░▒▒▒▒░░  ▒▒▒▒                                
-//                               ▒▒▒▒░░▒▒▒▒▓▓▓▓██▓▓▓▓▒▒░░░░▒▒▓▓▒▒▒▒▒▒▒▒▒▒▓▓▒▒▓▓▒▒▓▓▒▒▓▓▓▓▓▓▓▓▒▒░░░░▒▒░░░░░░                              
-//                               ▒▒▒▒░░▒▒▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▓▓▒▒▒▒░░▒▒▓▓▓▓▓▓▒▒▓▓▒▒▒▒░░▒▒▒▒▒▒                              
-//                                 ▒▒▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▒▒██▓▓▓▓▓▓▒▒▒▒░░▓▓▓▓▓▓░░░░▒▒▒▒▓▓▒▒▒▒▒▒▒▒░░                              
-//                               ░░▒▒▒▒▒▒▓▓▓▓▒▒░░░░▒▒▒▒▒▒▓▓▓▓▓▓▒▒▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒░░░░░░░░░░▒▒▒▒░░░░░░░░░░░░                        
-//                             ▒▒▒▒░░▒▒░░░░░░░░▒▒▒▒▒▒▒▒▒▒▓▓██▓▓▒▒▒▒▒▒▓▓▓▓▓▓▓▓░░▓▓▒▒░░▒▒▒▒▒▒  ░░░░░░▒▒▒▒▒▒▒▒░░░░░░░░                      
-//                       ░░▒▒▒▒▒▒░░░░▒▒░░▒▒░░▒▒▒▒▒▒▒▒▓▓▒▒▓▓▓▓▒▒▓▓▒▒▓▓▓▓░░░░░░░░▒▒▓▓▒▒▒▒░░▒▒▒▒▒▒▒▒▒▒▓▓▒▒▒▒▒▒░░░░▒▒░░                      
-//                 ░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓▒▒▒▒░░░░░░▒▒▓▓▓▓▒▒▓▓░░░░░░░░░░░░▒▒░░▒▒░░▒▒▒▒░░░░▒▒▒▒▒▒▒▒▒▒░░▒▒▒▒░░░░░░░░                      
-//                 ▓▓▒▒▒▒░░▒▒▒▒▒▒▓▓▒▒▓▓▓▓▒▒▓▓▓▓▒▒▒▒▓▓▓▓▓▓▓▓░░▒▒░░░░░░░░░░▒▒▒▒▒▒▒▒░░▒▒░░░░▒▒░░░░░░░░▒▒▒▒░░  ░░▒▒░░░░                      
-//                 ░░▒▒░░░░▒▒▓▓▓▓▓▓▒▒▒▒▒▒▓▓▒▒▓▓▒▒▓▓▓▓▓▓▓▓░░▒▒▓▓░░▒▒▒▒▒▒▒▒▒▒▓▓▒▒▓▓▓▓░░▒▒▒▒░░░░▒▒▒▒▒▒▒▒▒▒░░░░                              
-//                 ░░░░░░▒▒▒▒▒▒▓▓▒▒░░░░▒▒▓▓▒▒░░▓▓▓▓▓▓▒▒▓▓▓▓▒▒▓▓▒▒▓▓░░▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒░░▒▒░░▒▒░░▒▒░░░░░░▒▒▒▒                        
-//                 ░░░░▒▒▒▒▒▒▒▒▓▓▒▒▒▒▒▒░░░░░░░░▒▒▓▓▓▓▓▓▓▓▒▒░░▓▓▒▒▓▓▒▒▓▓▓▓▓▓▓▓▓▓████▓▓▓▓▓▓░░▒▒▓▓▒▒▒▒▒▒▒▒▒▒▒▒░░░░▒▒                        
-//                   ░░▒▒▒▒▒▒▒▒▒▒▓▓▒▒▒▒░░▒▒▒▒░░  ▒▒▒▒▒▒░░  ▓▓▓▓▓▓▒▒▒▒▓▓▒▒▓▓██████▓▓▒▒▒▒▒▒▓▓▓▓░░░░▒▒░░▒▒▒▒▒▒░░▒▒░░░░▒▒░░                  
-//                     ░░  ▒▒░░▓▓▒▒░░░░░░░░▒▒▒▒░░▒▒▒▒▓▓░░    ████  ░░▒▒░░▒▒▓▓▓▓▒▒▒▒▒▒▒▒▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒                  
-//             ░░░░▒▒▒▒░░░░▒▒▒▒▒▒▒▒░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  ▒▒░░▒▒▒▒░░░░▒▒▒▒░░░░░░▒▒▒▒░░░░▓▓  ▓▓░░▒▒▒▒▓▓░░░░▒▒▒▒▒▒▒▒▒▒░░░░                
-//             ▒▒▒▒░░░░░░▒▒▒▒▒▒░░░░░░▒▒░░▒▒▒▒▒▒▒▒▓▓▓▓▒▒▒▒░░░░▒▒▒▒▒▒░░░░░░▒▒▓▓░░░░░░▓▓▒▒▒▒▓▓▒▒░░▒▒▒▒▒▒▒▒░░  ░░░░▒▒░░▒▒▒▒▒▒                
-//           ░░░░░░░░▒▒▒▒▒▒▓▓▓▓▒▒▒▒▒▒▓▓▒▒▓▓▒▒▓▓▒▒░░░░▒▒░░░░▒▒▒▒▓▓▒▒▒▒▒▒▒▒▒▒░░▒▒▒▒▓▓▒▒▓▓▓▓▒▒▒▒▒▒▒▒░░░░░░  ░░░░░░░░░░▒▒░░░░░░              
-//           ▒▒░░░░░░░░░░▓▓▓▓▓▓▓▓▒▒▓▓▓▓▒▒▒▒▓▓▓▓▒▒  ░░▒▒░░▒▒▒▒▓▓▓▓██▓▓▓▓▒▒▒▒▒▒▓▓▓▓██▓▓██▓▓██▒▒▒▒▒▒▒▒▒▒░░░░▒▒░░░░▒▒▓▓▒▒▒▒▒▒░░              
-//           ░░▓▓░░▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▓▓▒▒░░▓▓▒▒▒▒▒▒▒▒▓▓▓▓▓▓████▓▓▓▓▓▓▓▓██▓▓▓▓▓▓▓▓░░▒▒▓▓▒▒▒▒▒▒▒▒▒▒░░░░▒▒▒▒▓▓░░░░▒▒▒▒                
-//           ▒▒▒▒▒▒▓▓▒▒▓▓▓▓▓▓▒▒░░▓▓▓▓▓▓▓▓▓▓▓▓██▓▓░░▒▒▒▒▒▒▒▒▒▒▓▓▒▒██▓▓▒▒░░▒▒▒▒▒▒▓▓▓▓▒▒▓▓░░  ▒▒▓▓▓▓▒▒░░░░░░░░░░▓▓▓▓▒▒▒▒░░░░                
-//             ░░░░▒▒░░▓▓▒▒▒▒        ▒▒▓▓▓▓▒▒▒▒░░▓▓░░▒▒▒▒▓▓▒▒░░░░░░░░▒▒░░▓▓    ▒▒░░▒▒▒▒▒▒▒▒░░▒▒▓▓▒▒▒▒▒▒▒▒░░░░▒▒▒▒▒▒▒▒▒▒                  
-//                     ░░    ░░░░░░░░▒▒▒▒▒▒    ▓▓▓▓░░▒▒░░░░░░░░░░░░░░░░░░░░░░░░░░░░▒▒░░▓▓░░░░▒▒▒▒▓▓▒▒▒▒▒▒░░░░░░  ░░▒▒░░                  
-//                         ░░▒▒▓▓▓▓▒▒▓▓▒▒░░▒▒░░▒▒░░▒▒▒▒░░░░░░░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░▒▒░░▓▓▒▒░░▒▒░░░░▒▒▒▒▒▒▒▒░░░░  ░░░░                      
-//                   ▒▒    ░░▒▒▓▓▓▓▓▓▓▓▒▒░░▒▒▒▒░░▒▒▒▒▒▒░░▒▒▒▒▒▒▒▒░░░░▒▒▒▒▒▒▒▒▒▒░░▒▒▒▒▓▓▒▒▓▓▓▓▒▒▒▒▓▓░░▒▒▒▒▒▒░░░░░░▒▒                      
-//                   ▒▒░░░░░░▒▒▓▓▓▓▓▓▓▓▒▒▒▒▓▓▓▓▒▒▒▒▓▓░░░░▒▒░░░░▒▒▒▒▓▓░░░░▓▓░░▒▒▓▓▓▓▓▓▓▓▒▒▓▓▓▓▓▓▓▓▓▓░░▒▒▓▓▒▒░░░░░░▒▒░░                    
-//                 ░░▒▒▒▒▒▒░░▒▒▓▓▓▓▓▓▓▓▒▒▒▒██▓▓▒▒▓▓▒▒░░▒▒░░░░▒▒▒▒▒▒▓▓▓▓▓▓▓▓▒▒▓▓████▓▓▒▒▒▒▓▓▓▓▓▓▒▒▒▒░░▒▒▓▓░░▒▒▒▒▒▒▒▒▒▒                    
-//         ░░░░░░░░░░▒▒░░░░░░▒▒▒▒▒▒▒▒░░▒▒▓▓▓▓▓▓▓▓▓▓▓▓▒▒░░░░░░▒▒░░▓▓██▒▒▓▓████████▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▓▓▒▒░░░░░░▒▒░░░░                  
-//           ▒▒▒▒▒▒▒▒░░░░░░░░▒▒░░▒▒░░░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▓▓▓▓▓▓▒▒▒▒▒▒▓▓▓▓██▓▓██  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▓▓▓▓▓▓▒▒▒▒░░▒▒▒▒▒▒░░                  
-//         ░░░░▒▒▒▒▓▓▒▒░░░░▒▒▒▒▒▒▒▒▒▒░░  ░░▓▓▒▒▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓▒▒▓▓██▓▓▓▓▓▓▓▓▓▓████▒▒▓▓▒▒▓▓▓▓▓▓▒▒░░░░▒▒░░▒▒▒▒░░▒▒░░▒▒▒▒░░                
-//         ░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓▓▓░░    ░░▒▒░░▒▒▒▒▓▓▓▓▓▓▓▓▓▓▒▒▓▓▓▓▒▒▓▓▒▒▓▓▒▒██▒▒▓▓▒▒▓▓▒▒▓▓▒▒░░░░░░▒▒▒▒░░░░▒▒▓▓░░▒▒░░                  
-//         ▒▒▒▒▒▒▒▒░░▒▒▒▒▒▒▒▒▒▒▓▓▒▒▒▒░░▒▒▓▓▓▓▒▒▒▒▒▒░░▒▒▓▓▒▒▒▒▓▓▒▒▓▓▓▓██░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░░░▒▒▒▒▒▒░░▒▒▒▒░░░░                    
-//     ░░░░▒▒▒▒░░░░░░░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░  ░░  ░░░░▓▓▓▓▓▓░░  ▒▒▒▒▒▒▓▓▓▓  ░░▒▒▒▒  ▒▒▒▒▓▓▒▒▓▓▒▒░░▒▒▒▒▒▒░░░░▒▒▒▒▒▒▒▒  ░░                    
-//     ░░░░░░▒▒░░░░▒▒▒▒▒▒▓▓▒▒▒▒▒▒▒▒▒▒▒▒        ░░░░▓▓▓▓██▒▒      ▒▒▒▒▓▓  ░░▒▒░░  ░░▓▓▓▓  ▒▒▓▓░░▓▓░░░░░░  ▒▒▒▒░░                          
-//       ░░░░▒▒░░▒▒▒▒▒▒▓▓▓▓▒▒▒▒▒▒▒▒░░░░░░░░░░▒▒░░░░▓▓▓▓▓▓▓▓░░    ▒▒▒▒▓▓▒▒▒▒▒▒    ░░▓▓▒▒  ░░    ▒▒▒▒▒▒░░░░  ░░                            
-//     ░░░░▒▒░░▒▒▒▒▒▒▒▒▒▒▓▓▓▓▒▒░░░░▒▒    ░░░░░░░░▓▓▓▓▓▓░░░░▓▓▒▒▒▒▒▒▒▒▓▓▒▒▒▒        ░░▒▒      ▓▓▒▒  ░░░░                                  
-//           ░░▒▒▒▒▒▒░░▒▒▒▒▒▒▒▒▒▒▒▒░░    ░░▒▒▒▒▒▒▓▓▓▓▓▓      ▒▒▒▒▒▒░░▒▒▓▓                    ░░░░░░                                      
-//             ▒▒▒▒  ░░░░▒▒▓▓▓▓▒▒▒▒░░      ▒▒░░▒▒▒▒▒▒          ▒▒▒▒▒▒▒▒▓▓                                                                
-//           ░░▒▒▒▒░░      ░░▓▓▓▓  ░░    ░░░░▒▒▒▒▓▓▒▒          ░░░░▒▒▒▒▒▒                                                                
-//             ░░░░      ░░▒▒▓▓▒▒░░        ░░▒▒▒▒░░░░░░          ▒▒▒▒▒▒▒▒                                                                
-//                         ░░░░            ░░▒▒                  ░░░░▒▒▒▒                                                                
-//                                                               ▒▒▒▒▓▓▒▒                                                                
-//                                                               ░░▒▒▓▓▒▒                                                                
-//                                                               ░░▒▒▒▒▒▒                                                                
-//                                                               ░░▒▒▒▒▒▒                                                                
-//                                                               ░░░░▓▓▒▒                                                                
-//                                                               ░░░░▒▒▓▓                                                                
-//                                                               ░░░░▒▒▓▓                                                                
-//                                                               ░░░░░░▒▒                                                                
-//                                                               ▒▒░░░░▒▒                                                                
-//                                                               ▒▒░░▓▓▒▒░░                                                              
-// ░░░░      ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▒▒▒▒▒▒▒▒▒▒▓▓▒▒▒▒░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░    ░░░░░░░░░░░░░░░░░░
-
-/* Contract for NFtrees */
-
 contract NFTree is Ownable, ERC721URIStorage {
     uint256 tokenId;
-    address purchaseContract;
+    address[] whitelists;
+    
+    mapping(address => Whitelist) whitelistMap;
 
-    // should we use @openzeppelin/contracts/utils/Counters.sol ?
-    // instead of manual tokenId
+    struct Whitelist {
+        bool isValid;
+        address contractAddress;
+    }
+
     constructor() ERC721('NFTree', 'TREE')
     {
         tokenId = 1;
     }
-    
-    // we need a data structure to keep track of multiple purchase/factory/minting contracts
-    // add() and remove() token contracts from this data strucute whitelist
-    function setPurchaseContract(address _purchaseContract) external onlyOwner{
-        purchaseContract = _purchaseContract;
-    }
-    
-    function getPurchaseContract() external view returns(address){
-        return(purchaseContract);
+
+    function addWhitelist(address _contractAddress) external onlyOwner{
+        require(whitelistMap[_contractAddress].isValid, 'Contrat already whitelisted.');
+
+        whitelistMap[_contractAddress] = Whitelist(true, _contractAddress);
+        whitelists.push(_contractAddress);
     }
 
-    function buyNFTree(address _recipient, string memory _tokenHash) external {
-        require(msg.sender == purchaseContract, 'Only purchase contract can call buyNFTree');
-        
-        _safeMint(_recipient, tokenId);
-        _setTokenURI(tokenId, _tokenHash);
-        tokenId = tokenId + 1;
+    function removeWhitelist(address _contractAddress) external onlyOwner {
+        require(whitelistMap[_contractAddress].isValid, 'Not a valid whitelisted contract.');
+
+        uint256 index;
+
+        for (uint256 i = 0; i <= whitelists.length; i++) {
+            if (whitelists[i] == _contractAddress) {
+                index = i;
+            }
+        }
+
+        whitelists[index] = whitelists[whitelists.length - 1];
+
+        delete whitelists[whitelists.length - 1];
+        delete whitelistMap[_contractAddress];
+    }
+    
+    function getWhitelists() external view returns(address[] memory){
+        return whitelists;
     }
 
-    // should we use ERC721Enumerable.sol?
-    // instead of creating our own function
+    function getNextTokenId() external view returns(uint256){
+        return tokenId;
+    }
+
     function tokensOfOwner(address _owner) external view returns(uint256[] memory) {
         uint256 tokenCount = balanceOf(_owner);
 
@@ -123,8 +78,12 @@ contract NFTree is Ownable, ERC721URIStorage {
 
     }
 
-    function getNextTokenId() external view returns(uint256){
-        return(tokenId);
+    function buyNFTree(address _recipient, string memory _tokenURI) external {
+        require(whitelistMap[msg.sender].isValid, 'Only whitelisted addresses can mint NFTrees.');
+        
+        _safeMint(_recipient, tokenId);
+        _setTokenURI(tokenId, _tokenURI);
+        tokenId = tokenId + 1;
     }
 
 }

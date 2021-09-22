@@ -17,24 +17,20 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 //       |.|        | |         | |
 //    \\/ ._\//_/__/  ,\_//__\\/.  \_//__/_
 
-
-/* Contract for NFtrees */
-
 /**  
-    @title Purchase contract assists in the purchase/minting of NFTree ERC-721 tokens.
+    @title NFTreeFactory assists in the purchase/minting of base level NFTree ERC-721 tokens.
  */
 
-contract Purchase is Ownable {
+contract NFTreeFactory is Ownable {
 
     INFTree nftree;
     address treasury;
     uint256 totalOffset;
+    uint256[] levels;
+    string[] coins;
 
     mapping(uint256 => Level) levelMap;
     mapping(string => Coin) coinMap;
-
-    uint256[] levels;
-    string[] coins;
 
     struct Level {
         bool isValid;
@@ -120,10 +116,19 @@ contract Purchase is Ownable {
      */
     function removeLevel(uint256 _level) external onlyOwner {
         require(levelMap[_level].isValid, 'Not a valid level.');
-        // delete Level
-        // delete mapping
-        // remove from array
-        
+
+        uint256 index;
+
+        for (uint256 i = 0; i <= levels.length; i++) {
+            if (levels[i] == _level){
+                index = i;
+            }
+        }
+
+        levels[index] = levels[levels.length - 1];
+
+        delete levels[levels.length - 1];
+        delete levelMap[_level];
     }
 
     /**
@@ -171,9 +176,19 @@ contract Purchase is Ownable {
      */
     function removeCoin(string memory _coin) external onlyOwner {
         require(coinMap[_coin].isValid, 'Not a valid coin.');
-        // delete Coin
-        // delete mapping
-        // remove from array
+
+        uint256 index;
+
+        for (uint256 i = 0; i <= coins.length; i++) {
+            if (keccak256(abi.encodePacked(coins[i])) == keccak256(abi.encodePacked(_coin))){
+                index = i;
+            }
+        }
+
+        coins[index] = coins[coins.length - 1];
+
+        delete coins[coins.length - 1];
+        delete coinMap[_coin];
     }
 
     /**
