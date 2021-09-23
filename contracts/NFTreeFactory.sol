@@ -28,6 +28,7 @@ contract NFTreeFactory is Ownable {
     uint256 totalOffset;
     uint256[] levels;
     string[] coins;
+    uint256 conversion_factor = 10 ** 18;
 
     mapping(uint256 => Level) levelMap;
     mapping(string => Coin) coinMap;
@@ -118,7 +119,7 @@ contract NFTreeFactory is Ownable {
 
         uint256 index;
 
-        for (uint256 i = 0; i <= levels.length; i++) {
+        for (uint256 i = 0; i < levels.length; i++) {
             if (levels[i] == _level){
                 index = i;
             }
@@ -126,7 +127,7 @@ contract NFTreeFactory is Ownable {
 
         levels[index] = levels[levels.length - 1];
 
-        delete levels[levels.length - 1];
+        levels.pop();
         delete levelMap[_level];
     }
 
@@ -142,7 +143,7 @@ contract NFTreeFactory is Ownable {
      */
     function getLevel(uint256 _level) external view returns(uint256, uint256, uint256, string memory) {
         require(levelMap[_level].isValid, 'Not a valid level');
-        return (levelMap[_level].cost, levelMap[_level].carbonValue, levelMap[_level].numMinted, levelMap[_level].tokenURI);
+        return (levelMap[_level].carbonValue, levelMap[_level].cost, levelMap[_level].numMinted, levelMap[_level].tokenURI);
     }
 
     /**
@@ -150,19 +151,18 @@ contract NFTreeFactory is Ownable {
         @return uint256[] {levels}.
      */
     function getValidLevels() external view returns(uint256[] memory) {
-        // uint256 sortedLevels = sort(levels);
         return levels;
     }
 
     /**
         @dev Creates new Coin instance and maps to the {coins} array.
-        @param _address Contract address for the coin.
         @param _coin Coin name.
+        @param _address Contract address for the coin.
 
         Requirements:
             - {_coin} must not already be a valid coin.
      */
-    function addCoin(address _address, string memory _coin) external onlyOwner {
+    function addCoin(string memory _coin, address _address) external onlyOwner {
         require(!coinMap[_coin].isValid, 'Already a valid coin.');
 
         coins.push(_coin);
@@ -182,7 +182,7 @@ contract NFTreeFactory is Ownable {
 
         uint256 index;
 
-        for (uint256 i = 0; i <= coins.length; i++) {
+        for (uint256 i = 0; i < coins.length; i++) {
             if (keccak256(abi.encodePacked(coins[i])) == keccak256(abi.encodePacked(_coin))){
                 index = i;
             }
@@ -190,7 +190,7 @@ contract NFTreeFactory is Ownable {
 
         coins[index] = coins[coins.length - 1];
 
-        delete coins[coins.length - 1];
+        coins.pop();
         delete coinMap[_coin];
     }
 
@@ -225,7 +225,7 @@ contract NFTreeFactory is Ownable {
             - Allowance of {address(this)} to spend {msg.sender}'s {_coin} must be greater than or equal to {_amount}.
 
      */
-    function buyNFTree(uint256 _tonnes, uint256 _amount, string memory _coin) external {
+    function mintNFTree(uint256 _tonnes, uint256 _amount, string memory _coin) external {
         // check requirements
         require(msg.sender != address(0) && msg.sender != address(this), 'Sending from zero address.'); 
         require(levelMap[_tonnes].isValid, 'Not a valid level.');
@@ -235,8 +235,8 @@ contract NFTreeFactory is Ownable {
         require(coinMap[_coin].coinContract.allowance(msg.sender, address(this)) >= _amount, 'Not enough allowance.');
         
         // transfer tokens
-        coinMap[_coin].coinContract.transferFrom(msg.sender, treasury, _amount);
-        nftree.buyNFTree(msg.sender, levelMap[_tonnes].tokenURI);
+        coinMap[_coin].coinContract.transferFrom(msg.sender, treasury, _amount * conversion_factor);
+        nftree.mintNFTree(msg.sender, levelMap[_tonnes].tokenURI);
         
         // log purchase
         levelMap[_tonnes].numMinted += 1;

@@ -37,7 +37,7 @@ contract NFTree is Ownable, ERC721URIStorage {
             - {_contractAddress} must not already be the address of a contract on the whitelist.
      */
     function addWhitelist(address _contractAddress) external onlyOwner{
-        require(whitelistMap[_contractAddress].isValid, 'Contract already whitelisted.');
+        require(!whitelistMap[_contractAddress].isValid, 'Contract already whitelisted.');
 
         whitelistMap[_contractAddress] = Whitelist(true, _contractAddress);
         whitelists.push(_contractAddress);
@@ -56,7 +56,7 @@ contract NFTree is Ownable, ERC721URIStorage {
 
         uint256 index;
 
-        for (uint256 i = 0; i <= whitelists.length; i++) {
+        for (uint256 i = 0; i < whitelists.length; i++) {
             if (whitelists[i] == _contractAddress) {
                 index = i;
             }
@@ -64,7 +64,7 @@ contract NFTree is Ownable, ERC721URIStorage {
 
         whitelists[index] = whitelists[whitelists.length - 1];
 
-        delete whitelists[whitelists.length - 1];
+        whitelists.pop();
         delete whitelistMap[_contractAddress];
     }
     
@@ -77,7 +77,7 @@ contract NFTree is Ownable, ERC721URIStorage {
     }
 
     /**
-        @dev Retrieves next token id.
+        @dev Retrieves next token id to be minted.
         @return uint256 {tokenId}.
      */
     function getNextTokenId() external view returns(uint256){
@@ -119,12 +119,11 @@ contract NFTree is Ownable, ERC721URIStorage {
         Requirements:
             - {msg.sender} must be a whitelisted contract.
      */
-    function buyNFTree(address _recipient, string memory _tokenURI) external {
+    function mintNFTree(address _recipient, string memory _tokenURI) external {
         require(whitelistMap[msg.sender].isValid, 'Only whitelisted addresses can mint NFTrees.');
         
         _safeMint(_recipient, tokenId);
         _setTokenURI(tokenId, _tokenURI);
         tokenId = tokenId + 1;
     }
-
 }
