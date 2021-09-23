@@ -25,7 +25,6 @@ contract NFTreeFactory is Ownable {
 
     INFTree nftree;
     address treasury;
-    uint256 totalOffset;
     uint256[] levels;
     string[] coins;
     uint256 conversion_factor = 10 ** 18;
@@ -37,6 +36,7 @@ contract NFTreeFactory is Ownable {
         bool isValid;
         uint256 cost;
         uint256 carbonValue;
+        uint256 treeValue;
         uint256 numMinted;
         string tokenURI;
     }
@@ -47,7 +47,7 @@ contract NFTreeFactory is Ownable {
     }
 
     /**
-        @dev Sets values for {nftree} and {treasury}. Initializes {totalOffset} to 0 tonnes.
+        @dev Sets values for {nftree} and {treasury}.
         @param _nftreeAddress NFTree contract address.
         @param _treasuryAddress NFTrees vault wallet address.
      */
@@ -55,7 +55,6 @@ contract NFTreeFactory is Ownable {
     {   
         nftree = INFTree(_nftreeAddress);
         treasury = _treasuryAddress;
-        totalOffset = 0;
     }
 
     /**
@@ -95,15 +94,16 @@ contract NFTreeFactory is Ownable {
         @dev Creates new Level instance and maps to the {levels} array. If the level already exists,
         the function updates the struct but does not push to the levels array.
         @param _level Carbon value.
+        @param _trees Number of trees planted.
         @param _cost Cost of level.
         @param _tokenURI IPFS hash of token metadata.
      */
-    function addLevel(uint256 _level, uint256 _cost, string memory _tokenURI) external onlyOwner {
+    function addLevel(uint256 _level, uint256 _trees, uint256 _cost, string memory _tokenURI) external onlyOwner {
         if (!levelMap[_level].isValid) {
             levels.push(_level);
         }
             
-        levelMap[_level] = Level(true, _cost, _level, 0, _tokenURI);
+        levelMap[_level] = Level(true, _cost, _level, _trees, 0, _tokenURI);
     }
 
     /**
@@ -141,9 +141,9 @@ contract NFTreeFactory is Ownable {
         requirements:
             - {_level} must be a valid level.
      */
-    function getLevel(uint256 _level) external view returns(uint256, uint256, uint256, string memory) {
+    function getLevel(uint256 _level) external view returns(uint256, uint256, uint256, uint256, string memory) {
         require(levelMap[_level].isValid, 'Not a valid level');
-        return (levelMap[_level].carbonValue, levelMap[_level].cost, levelMap[_level].numMinted, levelMap[_level].tokenURI);
+        return (levelMap[_level].carbonValue, levelMap[_level].treeValue, levelMap[_level].cost, levelMap[_level].numMinted, levelMap[_level].tokenURI);
     }
 
     /**
@@ -151,7 +151,7 @@ contract NFTreeFactory is Ownable {
         @return uint256[] {levels}.
      */
     function getValidLevels() external view returns(uint256[] memory) {
-        return levels;
+        return sort_array(levels);
     }
 
     /**
@@ -201,14 +201,6 @@ contract NFTreeFactory is Ownable {
     function getValidCoins() external view returns(string[] memory) {
         return coins;
     }
-    
-    /**
-        @dev Retrieves total offset.
-        @return uint256 {totalOffset}.
-     */
-    function getTotalOffset() external view returns(uint256){
-        return(totalOffset);
-    }
 
     /**
         @dev Mints NFTree to {msg.sender} and transfers payment to {treasury}. 
@@ -236,12 +228,29 @@ contract NFTreeFactory is Ownable {
         
         // transfer tokens
         coinMap[_coin].coinContract.transferFrom(msg.sender, treasury, _amount * conversion_factor);
-        nftree.mintNFTree(msg.sender, levelMap[_tonnes].tokenURI);
+        nftree.mintNFTree(msg.sender, levelMap[_tonnes].tokenURI, _tonnes, _tonnes);
         
         // log purchase
         levelMap[_tonnes].numMinted += 1;
-        totalOffset += _tonnes;
 
         // emit event
+    }
+
+    /**
+        @dev Sorts array.
+        @return uint256[] {arr}.
+     */
+    function sort_array(uint256[] memory arr) private pure returns (uint256[] memory) {
+        uint256 l = arr.length;
+        for(uint i = 0; i < l; i++) {
+            for(uint j = i+1; j < l ;j++) {
+                if(arr[i] > arr[j]) {
+                    uint256 temp = arr[i];
+                    arr[i] = arr[j];
+                    arr[j] = temp;
+                }
+            }
+        }
+        return arr;
     }
 }

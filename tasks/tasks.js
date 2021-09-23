@@ -1,11 +1,11 @@
 require("@nomiclabs/hardhat-web3");
 require('dotenv').config();
 const fs = require('fs');
-/*const purchaseABI = require("../nftrees-app/src/artifacts/contracts/Purchase.sol/Purchase.json").abi;
-const nftreeABI = require("../nftrees-app/src/artifacts/contracts/NFTree.sol/NFTree.json").abi;
-const daiABI = require("../nftrees-app/src/artifacts/contracts/DAI.sol/DAI.json").abi;
-const usdcABI = require("../nftrees-app/src/artifacts/contracts/USDC.sol/USDC.json").abi;
-const usdtABI = require("../nftrees-app/src/artifacts/contracts/USDT.sol/USDT.json").abi;*/
+const NFTreeFactoryABI = require("../artifacts/contracts/NFTreeFactory.sol/NFTreeFactory.json").abi;
+const NFTreeABI = require("../artifacts/contracts/NFTree.sol/NFTree.json").abi;
+const DAIABI = require("../artifacts/contracts/DAI.sol/DAI.json").abi;
+const USDCABI = require("../artifacts/contracts/USDC.sol/USDC.json").abi;
+const USDTABI = require("../artifacts/contracts/USDT.sol/USDT.json").abi;
 
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
@@ -31,23 +31,20 @@ task("init", "Initializes contracts")
     [owner] = await hre.ethers.getSigners();
 
     // create contract instances
-    var purchase = new web3.eth.Contract(purchaseABI, process.env.PURCHASE_ADDRESS);
-    var nftree = new web3.eth.Contract(nftreeABI, process.env.NFTREE_ADDRESS);
-
-    // set offramp wallet 
-    await purchase.methods.setOfframpWallet(process.env.OFFRAMP_WALLET).send({from: owner.address});
+    var nftreeFactory = new web3.eth.Contract(NFTreeFactoryABI, process.env.NFTREE_FACTORY_ADDRESS);
+    var nftree = new web3.eth.Contract(NFTreeABI, process.env.NFTREE_ADDRESS);
 
     // set purchase address in nftree contract
-    await nftree.methods.setPurchaseContract(process.env.PURCHASE_ADDRESS).send({from: owner.address});
+    await nftree.methods.addWhitelist(process.env.NFTREE_FACTORY_ADDRESS).send({from: owner.address});
 
-    // set nftree address in purchase contract
-    await purchase.methods.setNFTreeContract(process.env.NFTREE_ADDRESS).send({from: owner.address});
+    // set treasury address in nftreeFactory contract
+    await nftreeFactory.methods.setTreasury(process.env.TREASURY_ADDRESS).send({from: owner.address});
 
     // set token hashes
-    await purchase.methods.setTokenHash("1", process.env.TOKEN_URI_1).send({from: owner.address});
-    await purchase.methods.setTokenHash("10", process.env.TOKEN_URI_2).send({from: owner.address});
-    await purchase.methods.setTokenHash("100", process.env.TOKEN_URI_3).send({from: owner.address});
-    await purchase.methods.setTokenHash("1000", process.env.TOKEN_URI_4).send({from: owner.address});
+    await nftreeFactory.methods.addLevel(1, 1, 10, process.env.TOKEN_URI_1).send({from: owner.address});
+    await nftreeFactory.methods.addLevel(10, 10, 100, process.env.TOKEN_URI_10).send({from: owner.address});
+    await nftreeFactory.methods.addLevel(100, 100, 1000, process.env.TOKEN_URI_100).send({from: owner.address});
+    await nftreeFactory.methods.addLevel(1000, 1000, 10000, process.env.TOKEN_URI_1000).send({from: owner.address});
   });
 
 task("getInformation", "Retrieves contract information")
@@ -56,26 +53,26 @@ task("getInformation", "Retrieves contract information")
     [owner] = await hre.ethers.getSigners();
 
     // create contract instances
-    var purchase = new web3.eth.Contract(purchaseABI, process.env.PURCHASE_ADDRESS);
-    var nftree = new web3.eth.Contract(nftreeABI, process.env.NFTREE_ADDRESS);
+    var nftreeFactory = new web3.eth.Contract(NFTreeFactoryABI, process.env.NFTREE_FACTORY_ADDRESS);
+    var nftree = new web3.eth.Contract(NFTreeABI, process.env.NFTREE_ADDRESS);
 
     // get offramp wallet
-    console.log("Offramp wallet:", await purchase.methods.getOfframpWallet().call());
+    console.log("Treasury: ", await nftreeFactory.methods.getTreasury().call());
 
     //get purchase contract
-    console.log("Purchase contract:", await nftree.methods.getPurchaseContract().call());
+    console.log("Whitelisted contracts: ", await nftree.methods.getValidWhitelists().call());
 
     //get nftree contract
-    console.log("NFTree contract:", await purchase.methods.getNFTreeContract().call());
+    console.log("NFTree contract: ", await nftreeFactory.methods.getNFTreeContract().call());
 
     // get token hashes
-    console.log("Token URI 1:", await purchase.methods.getTokenHash(1).call());
-    console.log("Token URI 10:", await purchase.methods.getTokenHash(10).call());
-    console.log("Token URI 100:", await purchase.methods.getTokenHash(100).call());
-    console.log("Token URI 1000:", await purchase.methods.getTokenHash(1000).call());
+    console.log("1: ", await nftreeFactory.methods.getLevel(1).call());
+    console.log("10: ", await nftreeFactory.methods.getLevel(10).call());
+    console.log("100: ", await nftreeFactory.methods.getLevel(100).call());
+    console.log("1000: ", await nftreeFactory.methods.getLevel(1000).call());
 
     // get coins
-    console.log("coin list:", await purchase.methods.getCoins().call());
+    console.log("coin list: ", await nftreeFactory.methods.getValidCoins().call());
 });
 
 task("addToken", "Add token to purchase contract")
@@ -86,13 +83,13 @@ task("addToken", "Add token to purchase contract")
     [owner] = await hre.ethers.getSigners();
 
     // create contract instances
-    var purchase = new web3.eth.Contract(purchaseABI, process.env.PURCHASE_ADDRESS);
+    var nftreeFactory = new web3.eth.Contract(NFTreeFactoryABI, process.env.NFTREE_FACTORY_ADDRESS);
 
     // add token to nftree contract
-    await purchase.methods.addToken(taskArgs.address, taskArgs.token).send({from: owner.address});
+    await nftreeFactory.methods.addCoin(taskArgs.token, taskArgs.address).send({from: owner.address});
 });
 
-task("mint", "Mint token to address")
+/*task("mint", "Mint token to address")
   .addParam("token", "Name of token")
   .setAction(async (taskArgs) => {
     // set account
@@ -149,6 +146,7 @@ task("purchaseNFTree", "Purchase an nftree")
     let balance = await nftree.methods.balanceOf(owner.address).call();
     console.log(web3.utils.fromWei(balance, 'ether'));
 });
+*/
 
 
 module.exports = {};

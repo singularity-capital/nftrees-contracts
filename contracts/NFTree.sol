@@ -12,6 +12,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract NFTree is Ownable, ERC721URIStorage {
     uint256 tokenId;
+    uint256 public carbonOffset;
+    uint256 public treesPlanted;
     address[] whitelists;
     
     mapping(address => Whitelist) whitelistMap;
@@ -22,11 +24,13 @@ contract NFTree is Ownable, ERC721URIStorage {
     }
 
     /**
-        @dev Sets values for {_name} and {_symbol}.
+        @dev Sets values for {_name} and {_symbol}. Initializes {tokenId} to 1, {totalOffset} to 0, and {treesPlanted} to 0.
      */
     constructor() ERC721('NFTree', 'TREE')
     {
         tokenId = 1;
+        carbonOffset = 0;
+        treesPlanted = 0;
     }
 
     /**
@@ -119,11 +123,14 @@ contract NFTree is Ownable, ERC721URIStorage {
         Requirements:
             - {msg.sender} must be a whitelisted contract.
      */
-    function mintNFTree(address _recipient, string memory _tokenURI) external {
+    function mintNFTree(address _recipient, string memory _tokenURI, uint256 _carbonOffset, uint256 _treesPlanted) external {
         require(whitelistMap[msg.sender].isValid, 'Only whitelisted addresses can mint NFTrees.');
         
         _safeMint(_recipient, tokenId);
         _setTokenURI(tokenId, _tokenURI);
-        tokenId = tokenId + 1;
+
+        tokenId += 1;
+        carbonOffset += _carbonOffset;
+        treesPlanted += _treesPlanted;
     }
 }

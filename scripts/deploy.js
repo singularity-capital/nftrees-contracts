@@ -1,33 +1,29 @@
 const hre = require("hardhat");
 
 async function main() {
+  [owner] = await hre.ethers.getSigners();
 
-    // deploy purchase contract
-    const Purchase = await hre.ethers.getContractFactory("Purchase");
-    const purchase = await Purchase.deploy();
+  // deploy contracts
+  nftreeBuilder = await ethers.getContractFactory("NFTree");
+  nftree = await nftreeBuilder.deploy();
+  console.log('NFTree contract deployed to: ', nftree.address);
 
-    // deploy NFTree contract
-    const NFTree = await hre.ethers.getContractFactory("NFTree");
-    const nftree = await NFTree.deploy();
+  nftreeFactoryBuilder = await ethers.getContractFactory("NFTreeFactory");
+  nftreeFactory = await nftreeFactoryBuilder.deploy(nftree.address, owner.address);
+  console.log('NFTreeFactory contract deployed to: ', nftreeFactory.address);
 
-    // deploy DAI contract
-    const DAI = await hre.ethers.getContractFactory("DAI");
-    const dai = await DAI.deploy();
+  daiFactory = await ethers.getContractFactory("DAI");
+  dai = await daiFactory.deploy(); 
+  console.log('DAI contract deployed to: ', dai.address);
 
-    // deploy USDC contract
-    const USDC = await hre.ethers.getContractFactory("USDC");
-    const usdc = await USDC.deploy();
+  usdcFactory = await ethers.getContractFactory("USDC");
+  usdc = await usdcFactory.deploy(); 
+  console.log('USDC contract deployed to: ', usdc.address);
 
-    // deploy USDT contract
-    const USDT = await hre.ethers.getContractFactory("USDT");
-    const usdt = await USDT.deploy();
-  
-    console.log("Purchase deployed to:", purchase.address);
-    console.log("NFTree deployed to:", nftree.address);
-    console.log("DAI deployed to:", dai.address);
-    console.log("USDC deployed to:", usdc.address);
-    console.log("USDT deployed to:", usdt.address);
-  }
+  usdtFactory = await ethers.getContractFactory("USDT");
+  usdt = await usdtFactory.deploy(); 
+  console.log('USDT contract deployed to: ', usdt.address);
+}
   
   main()
     .then(() => process.exit(0))
