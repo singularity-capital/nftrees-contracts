@@ -6,11 +6,23 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 //import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+//               ,@@@@@@@,
+//       ,,,.   ,@@@@@@/@@,  .oo8888o.
+//    ,&%%&%&&%,@@@@@/@@@@@@,8888\88/8o
+//   ,%&\%&&%&&%,@@@\@@@/@@@88\88888/88'
+//   %&&%&%&/%&&%@@\@@/ /@@@88888\88888'
+//   %&&%/ %&%%&&@@\ V /@@' `88\8 `/88'
+//   `&%\ ` /%&'    |.|        \ '|8'
+//       |o|        | |         | |
+//       |.|        | |         | |
+//    \\/ ._\//_/__/  ,\_//__\\/.  \_//__/_
+
 /**  
     @title NFTree contract following the ERC-721 NFT token standard.
  */
 
 contract NFTree is Ownable, ERC721URIStorage {
+    
     uint256 tokenId;
     uint256 public carbonOffset;
     uint256 public treesPlanted;
@@ -76,7 +88,7 @@ contract NFTree is Ownable, ERC721URIStorage {
         @dev Retrieves array of valid whitelisted contracts.
         @return address[] {whitelists}.
      */
-    function getValidWhitelists() external view returns(address[] memory){
+    function getValidWhitelists() external view onlyOwner returns(address[] memory){
         return whitelists;
     }
 

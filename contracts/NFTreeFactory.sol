@@ -27,7 +27,6 @@ contract NFTreeFactory is Ownable {
     address treasury;
     uint256[] levels;
     string[] coins;
-    uint256 conversion_factor = 10 ** 18;
 
     mapping(uint256 => Level) levelMap;
     mapping(string => Coin) coinMap;
@@ -227,7 +226,7 @@ contract NFTreeFactory is Ownable {
         require(coinMap[_coin].coinContract.allowance(msg.sender, address(this)) >= _amount, 'Not enough allowance.');
         
         // transfer tokens
-        coinMap[_coin].coinContract.transferFrom(msg.sender, treasury, _amount * conversion_factor);
+        coinMap[_coin].coinContract.transferFrom(msg.sender, treasury, _amount * 1e18);
         nftree.mintNFTree(msg.sender, levelMap[_tonnes].tokenURI, _tonnes, _tonnes);
         
         // log purchase
