@@ -60,6 +60,9 @@ contract NFTreeFactory is Ownable {
         isLocked = false;
     }
 
+    /**
+        @dev Locks/unlocks minting.
+     */
     function toggleLock() external onlyOwner {
         isLocked = !isLocked;
     }
