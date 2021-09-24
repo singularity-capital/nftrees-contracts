@@ -2,9 +2,8 @@
 
 pragma solidity ^0.8.2;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-//import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 //               ,@@@@@@@,
 //       ,,,.   ,@@@@@@/@@,  .oo8888o.
@@ -18,9 +17,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 //    \\/ ._\//_/__/  ,\_//__\\/.  \_//__/_
 
 /**  
-    @title NFTree contract following the ERC-721 NFT token standard.
+    @title NFTree
+    @author Lorax + Bebop
+    @notice ERC-721 token that keeps track of carbon offset and trees planted.
  */
-
 contract NFTree is Ownable, ERC721URIStorage {
     
     uint256 tokenId;
@@ -46,13 +46,22 @@ contract NFTree is Ownable, ERC721URIStorage {
     }
 
     /**
+        @dev Emitted after a succesful NFTree mint.
+        @param _recipient Address that the NFTree was minted to.
+        @param _tokenId IPFS hash of token metadata.
+        @param _carbonOffset Number of carbon offset (tonnes).
+        @param _treesPlanted Number of trees planted.
+     */
+    event Mint(address _recipient, uint256 _tokenId, uint256 _carbonOffset, uint256 _treesPlanted);
+
+    /**
         @dev Creates new Whitelist instance and maps to the {whitelists} array.
-        @param _contractAddress the address of the contract to be whitelisted.
+        @param _contractAddress Address of the contract to be whitelisted.
 
         requirements:
             - {_contractAddress} must not already be the address of a contract on the whitelist.
      */
-    function addWhitelist(address _contractAddress) external onlyOwner{
+    function addWhitelist(address _contractAddress) external onlyOwner {
         require(!whitelistMap[_contractAddress].isValid, 'Contract already whitelisted.');
 
         whitelistMap[_contractAddress] = Whitelist(true, _contractAddress);
@@ -88,7 +97,7 @@ contract NFTree is Ownable, ERC721URIStorage {
         @dev Retrieves array of valid whitelisted contracts.
         @return address[] {whitelists}.
      */
-    function getValidWhitelists() external view onlyOwner returns(address[] memory){
+    function getValidWhitelists() external view onlyOwner returns(address[] memory) {
         return whitelists;
     }
 
@@ -96,7 +105,7 @@ contract NFTree is Ownable, ERC721URIStorage {
         @dev Retrieves next token id to be minted.
         @return uint256 {tokenId}.
      */
-    function getNextTokenId() external view returns(uint256){
+    function getNextTokenId() external view returns(uint256) {
         return tokenId;
     }
 
@@ -110,6 +119,7 @@ contract NFTree is Ownable, ERC721URIStorage {
         if (tokenCount == 0) {
             // Return an empty array
             return new uint256[](0);
+
         } else {
 
             uint256 resultIndex = 0;
@@ -128,9 +138,11 @@ contract NFTree is Ownable, ERC721URIStorage {
     }
 
     /**
-        @dev Mints NFTree to {_recipient}. 
+        @dev Mints NFTree to {_recipient}. Emits Mint event.
         @param _recipient Address to mint the NFTree to.
         @param _tokenURI IPFS hash of token metadata.
+        @param _carbonOffset Number of carbon offset (tonnes).
+        @param _treesPlanted Number of trees planted.
 
         Requirements:
             - {msg.sender} must be a whitelisted contract.
@@ -144,5 +156,7 @@ contract NFTree is Ownable, ERC721URIStorage {
         tokenId += 1;
         carbonOffset += _carbonOffset;
         treesPlanted += _treesPlanted;
+
+        emit Mint(_recipient, tokenId - 1, _carbonOffset, _treesPlanted);
     }
 }
