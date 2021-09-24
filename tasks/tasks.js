@@ -89,7 +89,7 @@ task("addToken", "Add token to purchase contract")
     await nftreeFactory.methods.addCoin(taskArgs.token, taskArgs.address).send({from: owner.address});
 });
 
-/*task("mint", "Mint token to address")
+task("mint", "Mint token to address")
   .addParam("token", "Name of token")
   .setAction(async (taskArgs) => {
     // set account
@@ -146,7 +146,7 @@ task("purchaseNFTree", "Purchase an nftree")
     let balance = await nftree.methods.balanceOf(owner.address).call();
     console.log(web3.utils.fromWei(balance, 'ether'));
 });
-*/
+
 
 
 module.exports = {};
