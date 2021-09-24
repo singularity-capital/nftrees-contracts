@@ -173,8 +173,22 @@ describe("Token contract", function () {
 
   describe("Purchase", function () {
     
-    it("Should purchase correctly", async function () {
+    /*it("Should lock correctly", async function () {
       // purchase NFTree
+      await nftreeFactory.toggleLock();
+
+      await nftreeFactory.toggleLock();
+
+      await nftreeFactory.connect(customer).mintNFTree(1, 10, 'DAI');
+      console.log('tokens of owner: ' + await nftree.tokensOfOwner(customer.address));
+
+    });*/
+
+    it("Should unlock and purchase correctly", async function () {
+      await nftreeFactory.toggleLock();
+
+      await nftreeFactory.toggleLock();
+
       await nftreeFactory.connect(customer).mintNFTree(1, 10, 'DAI');
       console.log('tokens of owner: ' + await nftree.tokensOfOwner(customer.address));
 
@@ -196,7 +210,7 @@ describe("Token contract", function () {
     });
 
     it("total offset", async function () {
-      console.log("total offset: " + await nftree.totalOffset);
+      //console.log("total offset: " + await nftree.carbonOffset);
     });
 
     it("numMinted", async function () {
@@ -204,7 +218,7 @@ describe("Token contract", function () {
     });
 
     it("trees planted", async function () {
-      console.log("Level 1 Struct: " + await nftree.treesPlanted);
+      //console.log("Level 1 Struct: " + await nftree.treesPlanted);
     });
   });
 });

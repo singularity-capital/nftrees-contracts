@@ -65,14 +65,17 @@ task("getInformation", "Retrieves contract information")
     //get nftree contract
     console.log("NFTree contract: ", await nftreeFactory.methods.getNFTreeContract().call());
 
-    // get token hashes
-    console.log("1: ", await nftreeFactory.methods.getLevel(1).call());
-    console.log("10: ", await nftreeFactory.methods.getLevel(10).call());
-    console.log("100: ", await nftreeFactory.methods.getLevel(100).call());
-    console.log("1000: ", await nftreeFactory.methods.getLevel(1000).call());
+    // get levels
+    console.log("Levels: ", await nftreeFactory.methods.getValidLevels().call());
 
     // get coins
     console.log("coin list: ", await nftreeFactory.methods.getValidCoins().call());
+
+    // get carbon offset
+    console.log("carbon offset: ", await nftree.methods.carbonOffset().call());
+
+    // get trees planted
+    console.log("trees planted: ", await nftree.methods.treesPlanted().call());
 });
 
 task("addToken", "Add token to purchase contract")

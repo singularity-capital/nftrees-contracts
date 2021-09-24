@@ -29,6 +29,7 @@ contract NFTreeFactory is Ownable {
     address treasury;
     uint256[] levels;
     string[] coins;
+    bool public isLocked;
 
     mapping(uint256 => Level) levelMap;
     mapping(string => Coin) coinMap;
@@ -56,6 +57,11 @@ contract NFTreeFactory is Ownable {
     {   
         nftree = INFTree(_nftreeAddress);
         treasury = _treasuryAddress;
+        isLocked = false;
+    }
+
+    function toggleLock() external onlyOwner {
+        isLocked = !isLocked;
     }
 
     /**
@@ -209,6 +215,7 @@ contract NFTreeFactory is Ownable {
         @param _coin Coin to be used to purchase.
 
         Requirements:
+            - {isLocked} must be false, mint lock must be off.
             - {msg.sender} can not be the zero address.
             - {_level} must be a valid level.
             - {_coin} must be a valid coin.
@@ -219,6 +226,7 @@ contract NFTreeFactory is Ownable {
      */
     function mintNFTree(uint256 _tonnes, uint256 _amount, string memory _coin) external {
         // check requirements
+        require(!isLocked, 'Minting is locked.');
         require(msg.sender != address(0) && msg.sender != address(this), 'Sending from zero address.'); 
         require(levelMap[_tonnes].isValid, 'Not a valid level.');
         require(coinMap[_coin].isValid, 'Not a valid coin.');
