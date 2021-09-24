@@ -228,7 +228,7 @@ contract NFTreeFactory is Ownable {
         
         // transfer tokens
         coinMap[_coin].coinContract.transferFrom(msg.sender, treasury, _amount * 1e18);
-        nftree.mintNFTree(msg.sender, levelMap[_tonnes].tokenURI, _tonnes, _tonnes);
+        nftree.mintNFTree(msg.sender, levelMap[_tonnes].tokenURI, _tonnes, _tonnes, "Genesis");
         
         // log purchase
         levelMap[_tonnes].numMinted += 1;

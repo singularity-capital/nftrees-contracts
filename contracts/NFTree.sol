@@ -51,8 +51,10 @@ contract NFTree is Ownable, ERC721URIStorage {
         @param _tokenId IPFS hash of token metadata.
         @param _carbonOffset Number of carbon offset (tonnes).
         @param _treesPlanted Number of trees planted.
+        @param _collection d Number of trees planted.
+        @param _collection Name of NFTree collection. 
      */
-    event Mint(address _recipient, uint256 _tokenId, uint256 _carbonOffset, uint256 _treesPlanted);
+    event Mint(address _recipient, uint256 _tokenId, uint256 _carbonOffset, uint256 _treesPlanted, string _collection);
 
     /**
         @dev Creates new Whitelist instance and maps to the {whitelists} array.
@@ -143,11 +145,12 @@ contract NFTree is Ownable, ERC721URIStorage {
         @param _tokenURI IPFS hash of token metadata.
         @param _carbonOffset Number of carbon offset (tonnes).
         @param _treesPlanted Number of trees planted.
+        @param _collection Name of NFTree collection. 
 
         Requirements:
             - {msg.sender} must be a whitelisted contract.
      */
-    function mintNFTree(address _recipient, string memory _tokenURI, uint256 _carbonOffset, uint256 _treesPlanted) external {
+    function mintNFTree(address _recipient, string memory _tokenURI, uint256 _carbonOffset, uint256 _treesPlanted, string memory _collection) external {
         require(whitelistMap[msg.sender].isValid, 'Only whitelisted addresses can mint NFTrees.');
         
         _safeMint(_recipient, tokenId);
@@ -157,6 +160,6 @@ contract NFTree is Ownable, ERC721URIStorage {
         carbonOffset += _carbonOffset;
         treesPlanted += _treesPlanted;
 
-        emit Mint(_recipient, tokenId - 1, _carbonOffset, _treesPlanted);
+        emit Mint(_recipient, tokenId - 1, _carbonOffset, _treesPlanted, _collection);
     }
 }
