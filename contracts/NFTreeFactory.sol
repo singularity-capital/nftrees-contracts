@@ -20,7 +20,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 /**  
     @title NFTreeFactory
     @author Lorax + Bebop
-    @notice Enables the purchase/minting of Genesis Colletion NFTrees ERC-721 tokens.
+    @notice Enables the purchase/minting of Genesis Colletion NFTrees.
  */
 
 contract NFTreeFactory is Ownable {
