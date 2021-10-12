@@ -19,13 +19,12 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 /**  
     @title NFTree
     @author Lorax + Bebop
-    @notice ERC-721 token that keeps track of carbon offset and trees planted.
+    @notice ERC-721 token that keeps track of total carbon offset.
  */
 contract NFTree is Ownable, ERC721URIStorage {
     
     uint256 tokenId;
     uint256 public carbonOffset;
-    uint256 public treesPlanted;
     address[] whitelists;
     
     mapping(address => Whitelist) whitelistMap;
@@ -42,7 +41,6 @@ contract NFTree is Ownable, ERC721URIStorage {
     {
         tokenId = 1;
         carbonOffset = 0;
-        treesPlanted = 0;
     }
 
     /**
@@ -50,11 +48,9 @@ contract NFTree is Ownable, ERC721URIStorage {
         @param _recipient Address that the NFTree was minted to.
         @param _tokenId IPFS hash of token metadata.
         @param _carbonOffset Number of carbon offset (tonnes).
-        @param _treesPlanted Number of trees planted.
-        @param _collection d Number of trees planted.
         @param _collection Name of NFTree collection. 
      */
-    event Mint(address _recipient, uint256 _tokenId, uint256 _carbonOffset, uint256 _treesPlanted, string _collection);
+    event Mint(address _recipient, uint256 _tokenId, uint256 _carbonOffset, string _collection);
 
     /**
         @dev Creates new Whitelist instance and maps to the {whitelists} array.
@@ -144,13 +140,12 @@ contract NFTree is Ownable, ERC721URIStorage {
         @param _recipient Address to mint the NFTree to.
         @param _tokenURI IPFS hash of token metadata.
         @param _carbonOffset Number of carbon offset (tonnes).
-        @param _treesPlanted Number of trees planted.
         @param _collection Name of NFTree collection. 
 
         Requirements:
             - {msg.sender} must be a whitelisted contract.
      */
-    function mintNFTree(address _recipient, string memory _tokenURI, uint256 _carbonOffset, uint256 _treesPlanted, string memory _collection) external {
+    function mintNFTree(address _recipient, string memory _tokenURI, uint256 _carbonOffset, string memory _collection) external {
         require(whitelistMap[msg.sender].isValid, 'Only whitelisted addresses can mint NFTrees.');
         
         _safeMint(_recipient, tokenId);
@@ -158,8 +153,7 @@ contract NFTree is Ownable, ERC721URIStorage {
 
         tokenId += 1;
         carbonOffset += _carbonOffset;
-        treesPlanted += _treesPlanted;
 
-        emit Mint(_recipient, tokenId - 1, _carbonOffset, _treesPlanted, _collection);
+        emit Mint(_recipient, tokenId - 1, _carbonOffset, _collection);
     }
 }

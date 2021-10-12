@@ -35,16 +35,13 @@ task("init", "Initializes contracts")
     var nftree = new web3.eth.Contract(NFTreeABI, process.env.NFTREE_ADDRESS);
 
     // set purchase address in nftree contract
-    await nftree.methods.addWhitelist(process.env.NFTREE_FACTORY_ADDRESS).send({from: owner.address});
-
-    // set treasury address in nftreeFactory contract
-    await nftreeFactory.methods.setTreasury(process.env.TREASURY_ADDRESS).send({from: owner.address});
+    //await nftree.methods.addWhitelist(process.env.NFTREE_FACTORY_ADDRESS).send({from: owner.address});
 
     // set token hashes
-    await nftreeFactory.methods.addLevel(1, 1, 10, process.env.TOKEN_URI_1).send({from: owner.address});
-    await nftreeFactory.methods.addLevel(10, 10, 100, process.env.TOKEN_URI_10).send({from: owner.address});
-    await nftreeFactory.methods.addLevel(100, 100, 1000, process.env.TOKEN_URI_100).send({from: owner.address});
-    await nftreeFactory.methods.addLevel(1000, 1000, 10000, process.env.TOKEN_URI_1000).send({from: owner.address});
+    await nftreeFactory.methods.addLevel(1, 10, process.env.TOKEN_URI_1).send({from: owner.address});
+    await nftreeFactory.methods.addLevel(10, 100, process.env.TOKEN_URI_10).send({from: owner.address});
+    await nftreeFactory.methods.addLevel(100, 1000, process.env.TOKEN_URI_100).send({from: owner.address});
+    await nftreeFactory.methods.addLevel(1000, 10000, process.env.TOKEN_URI_1000).send({from: owner.address});
   });
 
 task("getInformation", "Retrieves contract information")
@@ -73,9 +70,6 @@ task("getInformation", "Retrieves contract information")
 
     // get carbon offset
     console.log("carbon offset: ", await nftree.methods.carbonOffset().call());
-
-    // get trees planted
-    console.log("trees planted: ", await nftree.methods.treesPlanted().call());
 });
 
 task("addToken", "Add token to purchase contract")
@@ -145,7 +139,7 @@ task("purchaseNFTree", "Purchase an nftree")
     await mycoin.methods.approve(process.env.PURCHASE_ADDRESS, web3.utils.toWei(taskArgs.amount, "ether")).send({from: owner.address});
 
     // purchase nftree
-    await purchase.methods.buyNFTree(taskArgs.num, web3.utils.toWei(taskArgs.amount, "ether"), taskArgs.token).send({from: owner.address});
+    await purchase.methods.mintNFTree(taskArgs.num, web3.utils.toWei(taskArgs.amount, "ether"), taskArgs.token).send({from: owner.address});
     let balance = await nftree.methods.balanceOf(owner.address).call();
     console.log(web3.utils.fromWei(balance, 'ether'));
 });

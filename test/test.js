@@ -85,10 +85,10 @@ describe("Token contract", function () {
     // tests. It receives the test name, and a callback function.
 
     it("Add multiple levels", async function () {
-        await nftreeFactory.addLevel(1, 1, 10, "1 carbon credit");
-        await nftreeFactory.addLevel(10, 10, 100, "10 carbon credit");
-        await nftreeFactory.addLevel(100, 100, 1000, "100 carbon credit");
-        await nftreeFactory.addLevel(1000, 1000, 10000, "1000 carbon credit");
+        await nftreeFactory.addLevel(1, 10, "1 carbon credit");
+        await nftreeFactory.addLevel(10, 100, "10 carbon credit");
+        await nftreeFactory.addLevel(100, 1000, "100 carbon credit");
+        await nftreeFactory.addLevel(1000, 10000, "1000 carbon credit");
         var levels = await nftreeFactory.getValidLevels();
 
         expect(levels[0].toNumber()).to.equal(1);

@@ -38,7 +38,6 @@ contract NFTreeFactory is Ownable {
         bool isValid;
         uint256 cost;
         uint256 carbonValue;
-        uint256 treeValue;
         uint256 numMinted;
         string tokenURI;
     }
@@ -103,16 +102,15 @@ contract NFTreeFactory is Ownable {
         @dev Creates new Level instance and maps to the {levels} array. If the level already exists,
         the function updates the struct but does not push to the levels array.
         @param _level Carbon value.
-        @param _trees Number of trees planted.
         @param _cost Cost of level.
         @param _tokenURI IPFS hash of token metadata.
      */
-    function addLevel(uint256 _level, uint256 _trees, uint256 _cost, string memory _tokenURI) external onlyOwner {
+    function addLevel(uint256 _level, uint256 _cost, string memory _tokenURI) external onlyOwner {
         if (!levelMap[_level].isValid) {
             levels.push(_level);
         }
             
-        levelMap[_level] = Level(true, _cost, _level, _trees, 0, _tokenURI);
+        levelMap[_level] = Level(true, _cost, _level, 0, _tokenURI);
     }
 
     /**
@@ -150,9 +148,9 @@ contract NFTreeFactory is Ownable {
         requirements:
             - {_level} must be a valid level.
      */
-    function getLevel(uint256 _level) external view returns(uint256, uint256, uint256, uint256, string memory) {
+    function getLevel(uint256 _level) external view returns(uint256, uint256, uint256, string memory) {
         require(levelMap[_level].isValid, 'Not a valid level');
-        return (levelMap[_level].carbonValue, levelMap[_level].treeValue, levelMap[_level].cost, levelMap[_level].numMinted, levelMap[_level].tokenURI);
+        return (levelMap[_level].carbonValue, levelMap[_level].cost, levelMap[_level].numMinted, levelMap[_level].tokenURI);
     }
 
     /**
@@ -239,7 +237,7 @@ contract NFTreeFactory is Ownable {
         
         // transfer tokens
         coinMap[_coin].coinContract.transferFrom(msg.sender, treasury, _amount * 1e18);
-        nftree.mintNFTree(msg.sender, levelMap[_tonnes].tokenURI, _tonnes, _tonnes, "Genesis");
+        nftree.mintNFTree(msg.sender, levelMap[_tonnes].tokenURI, _tonnes, "Genesis");
         
         // log purchase
         levelMap[_tonnes].numMinted += 1;

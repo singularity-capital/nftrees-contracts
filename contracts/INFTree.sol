@@ -9,5 +9,5 @@ interface INFTree is IERC721{
     /**
         @dev see {NFTree-mintNFTree}
      */
-    function mintNFTree(address _recipient, string memory _tokenURI, uint256 _carbonOffset, uint256 _treesPlanted, string memory _collection) external;
+    function mintNFTree(address _recipient, string memory _tokenURI, uint256 _carbonOffset, string memory _collection) external;
 }
