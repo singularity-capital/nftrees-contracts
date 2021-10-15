@@ -12,7 +12,7 @@ async function main() {
   nftreeFactory = await nftreeFactoryBuilder.deploy(nftree.address, owner.address);
   console.log('NFTreeFactory contract deployed to: ', nftreeFactory.address);
 
-  daiFactory = await ethers.getContractFactory("DAI");
+  /*daiFactory = await ethers.getContractFactory("DAI");
   dai = await daiFactory.deploy(); 
   console.log('DAI contract deployed to: ', dai.address);
 
@@ -22,7 +22,7 @@ async function main() {
 
   usdtFactory = await ethers.getContractFactory("USDT");
   usdt = await usdtFactory.deploy(); 
-  console.log('USDT contract deployed to: ', usdt.address);
+  console.log('USDT contract deployed to: ', usdt.address);*/
 }
   
   main()

@@ -69,7 +69,7 @@ task("getInformation", "Retrieves contract information")
     console.log("coin list: ", await nftreeFactory.methods.getValidCoins().call());
 
     // get carbon offset
-    console.log("carbon offset: ", await nftree.methods.carbonOffset().call());
+    //console.log("carbon offset: ", await nftree.methods.carbonOffset().call());
 });
 
 task("addToken", "Add token to purchase contract")
