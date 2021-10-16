@@ -115,9 +115,9 @@ describe("Token contract", function () {
   describe("Coins", function () {
     
     it("Add coins", async function () {
-      await nftreeFactory.addCoin('DAI', dai.address);
-      await nftreeFactory.addCoin('USDC', usdc.address);
-      await nftreeFactory.addCoin('USDT', usdt.address);
+      await nftreeFactory.addCoin('DAI', dai.address, 18);
+      await nftreeFactory.addCoin('USDC', usdc.address, 18);
+      await nftreeFactory.addCoin('USDT', usdt.address, 18);
       var coinList = ['DAI', 'USDC', 'USDT'];
       var coinList = await nftreeFactory.getValidCoins();
 

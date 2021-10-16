@@ -45,6 +45,7 @@ contract NFTreeFactory is Ownable {
     struct Coin {
         bool isValid;
         IERC20 coinContract;
+        uint256 decimal;
     }
 
     /**
@@ -165,16 +166,16 @@ contract NFTreeFactory is Ownable {
         @dev Creates new Coin instance and maps to the {coins} array.
         @param _coin Coin name.
         @param _address Contract address for the coin.
+        @param _decimal Decimal number for the coin.
 
         Requirements:
             - {_coin} must not already be a valid coin.
      */
-    function addCoin(string memory _coin, address _address) external onlyOwner {
+    function addCoin(string memory _coin, address _address, uint256 _decimal) external onlyOwner {
         require(!coinMap[_coin].isValid, 'Already a valid coin.');
 
         coins.push(_coin);
-        coinMap[_coin] = Coin(true, IERC20(_address));
-
+        coinMap[_coin] = Coin(true, IERC20(_address), _decimal);
     }
 
     /**
@@ -236,7 +237,7 @@ contract NFTreeFactory is Ownable {
         require(coinMap[_coin].coinContract.allowance(msg.sender, address(this)) >= _amount, 'Not enough allowance.');
         
         // transfer tokens
-        coinMap[_coin].coinContract.transferFrom(msg.sender, treasury, _amount * 1e18);
+        coinMap[_coin].coinContract.transferFrom(msg.sender, treasury, _amount * (10**coinMap[_coin].decimal));
         nftree.mintNFTree(msg.sender, levelMap[_tonnes].tokenURI, _tonnes, "Genesis");
         
         // log purchase
@@ -245,19 +246,20 @@ contract NFTreeFactory is Ownable {
 
     /**
         @dev Sorts array.
+        @param _arr Array to sort.
         @return uint256[] {arr}.
      */
-    function sort_array(uint256[] memory arr) private pure returns (uint256[] memory) {
-        uint256 l = arr.length;
+    function sort_array(uint256[] memory _arr) private pure returns (uint256[] memory) {
+        uint256 l = _arr.length;
         for(uint i = 0; i < l; i++) {
             for(uint j = i+1; j < l ;j++) {
-                if(arr[i] > arr[j]) {
-                    uint256 temp = arr[i];
-                    arr[i] = arr[j];
-                    arr[j] = temp;
+                if(_arr[i] > _arr[j]) {
+                    uint256 temp = _arr[i];
+                    _arr[i] = _arr[j];
+                    _arr[j] = temp;
                 }
             }
         }
-        return arr;
+        return _arr;
     }
 }

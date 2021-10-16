@@ -4,12 +4,12 @@ async function main() {
   [owner] = await hre.ethers.getSigners();
 
   // deploy contracts
-  nftreeBuilder = await ethers.getContractFactory("NFTree");
+  /*nftreeBuilder = await ethers.getContractFactory("NFTree");
   nftree = await nftreeBuilder.deploy();
-  console.log('NFTree contract deployed to: ', nftree.address);
+  console.log('NFTree contract deployed to: ', nftree.address);*/
 
   nftreeFactoryBuilder = await ethers.getContractFactory("NFTreeFactory");
-  nftreeFactory = await nftreeFactoryBuilder.deploy(nftree.address, owner.address);
+  nftreeFactory = await nftreeFactoryBuilder.deploy("0xa44929195B0c3AF215c6efbe5c295cc6b99F7C44", owner.address);
   console.log('NFTreeFactory contract deployed to: ', nftreeFactory.address);
 
   /*daiFactory = await ethers.getContractFactory("DAI");

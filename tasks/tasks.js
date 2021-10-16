@@ -1,11 +1,11 @@
 require("@nomiclabs/hardhat-web3");
 require('dotenv').config();
 const fs = require('fs');
-const NFTreeFactoryABI = require("../artifacts/contracts/NFTreeFactory.sol/NFTreeFactory.json").abi;
+/*const NFTreeFactoryABI = require("../artifacts/contracts/NFTreeFactory.sol/NFTreeFactory.json").abi;
 const NFTreeABI = require("../artifacts/contracts/NFTree.sol/NFTree.json").abi;
 const DAIABI = require("../artifacts/contracts/DAI.sol/DAI.json").abi;
 const USDCABI = require("../artifacts/contracts/USDC.sol/USDC.json").abi;
-const USDTABI = require("../artifacts/contracts/USDT.sol/USDT.json").abi;
+const USDTABI = require("../artifacts/contracts/USDT.sol/USDT.json").abi;*/
 
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
